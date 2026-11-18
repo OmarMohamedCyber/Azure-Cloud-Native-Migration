@@ -1,73 +1,75 @@
 # Azure Cloud-Native Migration Project
 
+A hands-on Azure infrastructure and operations portfolio project demonstrating Infrastructure as Code, Linux workload hosting, cloud identity and access management, secrets management, monitoring, alerting, and incident troubleshooting.
+
+> **Environment:** Personal Azure lab / portfolio project. This is not a production deployment.
+
 ## Project Overview
 
-This project demonstrates the deployment of a cloud-hosted web application environment on Microsoft Azure using Infrastructure as Code (IaC).
+Designed and deployed an Azure-hosted Linux web workload using Terraform, then expanded the environment with managed identity, Azure Key Vault, centralized monitoring, and application availability checks. The project emphasizes repeatable infrastructure, least-privilege access, operational visibility, and documented troubleshooting.
 
-The objective is to establish a foundation for migrating a traditional web workload to the cloud while developing practical experience with cloud infrastructure, networking, Linux administration, and deployment automation.
+## Architecture and Technologies
 
-## Technologies Used
+- **Cloud:** Microsoft Azure
+- **Infrastructure as Code:** Terraform and Bicep
+- **Compute:** Ubuntu Server 24.04 LTS virtual machine
+- **Web service:** Nginx
+- **Networking:** Azure Virtual Network, web/application subnets, Network Security Group, static public IP
+- **Identity and secrets:** System-assigned managed identity, Azure RBAC, Azure Key Vault
+- **Monitoring:** Azure Monitor Agent, Data Collection Rules, Log Analytics, Application Insights
+- **Alerting:** KQL scheduled query alert and Azure Monitor Action Group email notification
+- **Automation and tooling:** Azure CLI, PowerShell, Git, GitHub
 
-- Microsoft Azure
-- Terraform
-- Ubuntu Server 24.04 LTS
-- Nginx
-- PowerShell
-- Git and GitHub
-- HTML
+## Implemented Capabilities
 
-## Infrastructure Deployed
+### Infrastructure as Code
+- Provisioned an Azure resource group, virtual network, segmented subnets, NSG, public IP, network interface, and Ubuntu VM with Terraform.
+- Used input variables for environment-specific SSH source IP configuration.
+- Used Bicep to define an Application Insights standard availability test.
 
-- Azure Resource Group
-- Azure Virtual Network
-- Dedicated web and application subnets
-- Network Security Group
-- Ubuntu Linux Virtual Machine
-- Static Public IP address
-- Nginx web server
-- Custom HTML landing page
+### Workload Identity and Secrets Management
+- Enabled a system-assigned managed identity on the Linux VM.
+- Applied Azure RBAC roles at Key Vault scope: **Key Vault Secrets User** for the VM identity and **Key Vault Secrets Officer** for the administrator identity.
+- Enabled Key Vault RBAC authorization, purge protection, and soft delete.
+- Validated managed-identity authentication and secret retrieval from the VM without placing secret values in the validation output.
 
-## Project Architecture
+### Monitoring and Availability
+- Configured Azure Monitor Agent and a Data Collection Rule to collect Linux performance counters and selected Syslog events at a 60-second sampling interval.
+- Routed collected data to Log Analytics.
+- Configured an Application Insights availability test to send HTTP GET requests to the Nginx site every five minutes and expect HTTP 200 responses.
+- Created a KQL scheduled query alert and Action Group email notification.
+- Validated monitoring behavior through a controlled website outage and subsequent recovery.
 
-The architecture documentation illustrates the Azure infrastructure, network components, security controls, and application traffic flow.
+### Troubleshooting and Operations
+- Diagnosed SSH timeouts caused by a changing ISP public IP and an NSG rule that still allowed the previous address.
+- Used PowerShell to identify the current public IP and update the local Terraform variable file, then applied the targeted NSG change.
+- Documented the incident, root cause, resolution, and lessons learned.
 
-[View Azure Architecture](docs/architecture.md)
+## Repository Structure
 
-## Implementation
+- `terraform/` — Azure infrastructure definitions.
+- `monitoring/` — Data Collection Rule, Bicep availability test, and PowerShell IP-monitoring script.
+- `docs/` — Architecture, deployment, security, troubleshooting, and incident documentation.
+- `screenshots/` — Selected deployment and validation evidence.
+- `website/` — Nginx website content.
+- `scripts/` — SSH source-IP update helper.
 
-Infrastructure was provisioned using Terraform and deployed to Microsoft Azure.
+## Documentation
 
-The Ubuntu virtual machine was configured to host a custom website using Nginx. SSH key-based authentication was used for administrative access, with inbound SSH traffic restricted through network security rules.
+- [Architecture](docs/architecture.md)
+- [Deployment](docs/deployment.md)
+- [Security](docs/security.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
-## Security Considerations
+## Security Notes and Lab Limitations
 
-- SSH key-based authentication.
-- Restricted inbound SSH access.
-- Network Security Group configuration.
-- Separation of web and application subnets.
-- Sensitive configuration and credential files excluded from version control.
-
-## Project Evidence
-
-Deployment screenshots are available in the `screenshots/` directory.
-
-The `terraform/` directory contains the infrastructure configuration, and the `website/` directory contains the custom HTML landing page.
+- SSH is configured for public-key authentication; password-based SSH authentication is disabled.
+- Inbound SSH is restricted to a configurable authorized source IP (/32); HTTP port 80 is open for the demonstration website.
+- Terraform state, local `.tfvars`, private keys, credentials, and local public-IP monitoring state must remain out of version control.
+- Key Vault public network access is enabled for this lab. A production design should evaluate private endpoints, network restrictions, diagnostic settings, secret rotation, and secure remote Terraform state.
+- The demo website currently uses HTTP. Production hosting should use HTTPS/TLS and an appropriately hardened network design.
+- The web subnet is provisioned as a separate network segment; the current Ubuntu workload is deployed in the application subnet.
 
 ## Skills Demonstrated
 
-- Infrastructure as Code (Terraform)
-- Microsoft Azure administration
-- Cloud networking and security
-- Linux server administration
-- Web server configuration
-- PowerShell
-- Git version control
-- Technical documentation
-
-## Planned Improvements
-
-- Configure HTTPS.
-- Implement Azure monitoring and logging.
-- Introduce Docker containerization.
-- Build a CI/CD pipeline using GitHub Actions.
-- Explore Azure-native application hosting services.
+Azure infrastructure provisioning, Terraform, Bicep, Azure networking, Linux administration, Nginx, managed identities, Azure RBAC, Key Vault, Azure Monitor, Log Analytics, Application Insights, KQL, PowerShell automation, troubleshooting, and technical documentation.
