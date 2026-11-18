@@ -60,6 +60,13 @@ Designed and deployed an Azure-hosted Linux web workload using Terraform, then e
 - [Deployment](docs/deployment.md)
 - [Security](docs/security.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [Incident report: SSH access after a dynamic public IP change](docs/incidents/INC-002-dynamic-public-ip-ssh-access.md)
+
+## Monitoring Source Files
+
+- [Application Insights availability test (Bicep)](monitoring/bicep/availability-test.bicep)
+- [Linux Data Collection Rule example (sanitized)](monitoring/linux-dcr.example.json)
+- [Public IP change notification script (PowerShell)](monitoring/scripts/monitor-public-ip.ps1)
 
 ## Security Notes and Lab Limitations
 
