@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.49.2.45890",
+      "templateHash": "16637021327622584396"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus"
+    },
+    "webTestName": {
+      "type": "string",
+      "defaultValue": "test-nginx-availability"
+    },
+    "requestUrl": {
+      "type": "string"
+    },
+    "appInsightsResourceId": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/webtests",
+      "apiVersion": "2022-06-15",
+      "name": "[parameters('webTestName')]",
+      "location": "[parameters('location')]",
+      "kind": "standard",
+      "tags": {
+        "[format('hidden-link:{0}', parameters('appInsightsResourceId'))]": "Resource"
+      },
+      "properties": {
+        "Name": "[parameters('webTestName')]",
+        "SyntheticMonitorId": "[parameters('webTestName')]",
+        "Description": "Monitors Nginx website availability",
+        "Enabled": true,
+        "Frequency": 300,
+        "Timeout": 30,
+        "Kind": "standard",
+        "RetryEnabled": true,
+        "Locations": [
+          {
+            "Id": "us-fl-mia-edge"
+          }
+        ],
+        "Request": {
+          "RequestUrl": "[parameters('requestUrl')]",
+          "HttpVerb": "GET",
+          "FollowRedirects": true,
+          "ParseDependentRequests": false
+        },
+        "ValidationRules": {
+          "ExpectedHttpStatusCode": 200,
+          "IgnoreHttpStatusCode": false,
+          "SSLCheck": false
+        }
+      }
+    }
+  ]
+}

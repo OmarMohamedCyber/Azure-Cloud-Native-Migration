@@ -24,3 +24,5 @@ monitoring/scripts/last-known-ip.txt
 
 # Local Terraform workspace state and plans
 *.tfplan
+
+screenshots/*.zip

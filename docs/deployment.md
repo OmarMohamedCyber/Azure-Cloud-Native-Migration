@@ -21,35 +21,38 @@ that Azure can process to create and manage cloud resources.
 
 The following Terraform commands were used during deployment:
 
-  -----------------------------------------------------------------------
-  Command                             Purpose
-  ----------------------------------- -----------------------------------
-  `terraform init`                    Initializes the Terraform working
-                                      directory and downloads the
-                                      required Azure provider
+\---
 
-  `terraform validate`                Checks the Terraform configuration
-                                      for errors
+Command                             Purpose
 
-  `terraform plan`                    Previews the infrastructure changes
-                                      before deployment
+\---
 
-  `terraform apply`                   Applies the configuration and
-                                      provisions Azure resources
-  -----------------------------------------------------------------------
+`terraform init`                    Initializes the Terraform working
+directory and downloads the
+required Azure provider
+
+`terraform validate`                Checks the Terraform configuration
+for errors
+
+`terraform plan`                    Previews the infrastructure changes
+before deployment
+
+`terraform apply`                   Applies the configuration and
+provisions Azure resources
+---
 
 ## Infrastructure Provisioned
 
 Terraform configuration files were used to deploy the following Azure
 infrastructure:
 
--   Azure Resource Group
--   Azure Virtual Network
--   Web and application subnets
--   Network Security Group
--   Static Public IP address
--   Network Interface
--   Ubuntu Linux Virtual Machine
+* Azure Resource Group
+* Azure Virtual Network
+* Web and application subnets
+* Network Security Group
+* Static Public IP address
+* Network Interface
+* Ubuntu Linux Virtual Machine
 
 The infrastructure was deployed in the East US Azure region.
 
@@ -79,38 +82,101 @@ Sensitive state files and credentials are excluded from version control.
 
 The project demonstrates practical experience with:
 
--   Infrastructure as Code
--   Terraform and Azure integration
--   Azure resource provisioning
--   Cloud networking
--   Linux virtual machine deployment
--   SSH administration
--   Nginx web server configuration
--   Git and GitHub version control
+* Infrastructure as Code
+* Terraform and Azure integration
+* Azure resource provisioning
+* Cloud networking
+* Linux virtual machine deployment
+* SSH administration
+* Nginx web server configuration
+* Git and GitHub version control
 
-## Monitoring and Observability
 
-The project was extended with Azure monitoring capabilities.
 
-### Data Collection Rule
+\## Azure Monitoring and Observability
 
-A Data Collection Rule (DCR) and Azure Monitor Agent configuration collect Linux telemetry and route it to the Log Analytics workspace.
 
-- Performance counters: processor utilization, available memory, and logical disk free space.
-- Sampling interval: 60 seconds.
-- Syslog facilities include authentication, cron, daemon, kernel, syslog, and user.
-- Syslog collection is configured for Warning, Error, Critical, Alert, and Emergency events.
 
-### Application Availability
+\### Centralized Linux Monitoring
 
-A Bicep template deploys an Application Insights Standard availability test for the Nginx website.
 
-- HTTP GET request every five minutes.
-- 30-second timeout.
-- Expected HTTP status: 200.
-- Retry behavior enabled.
-- External test location configured.
 
-### Alerting and Validation
+Azure Monitor Agent (AMA) was configured on the Ubuntu virtual machine to collect operating system performance and system log data.
 
-A KQL scheduled query alert evaluates availability results and uses an Azure Monitor Action Group for email notifications. Monitoring behavior was validated with a controlled HTTP 503 outage simulation followed by recovery.
+
+
+A Linux Data Collection Rule (DCR) defines the monitoring data collected and routes it to the Log Analytics workspace.
+
+
+
+Performance counters collected every 60 seconds include:
+
+
+
+\- CPU utilization.
+
+\- Available memory.
+
+\- Logical disk free space.
+
+
+
+Linux Syslog collection includes warning, error, critical, alert, and emergency events.
+
+
+
+\### Application Availability Monitoring
+
+
+
+An Azure Application Insights Standard availability test was deployed using Bicep.
+
+
+
+The test:
+
+\- Executes every five minutes.
+
+\- Sends HTTP GET requests to the Nginx website.
+
+\- Uses a 30-second timeout.
+
+\- Expects HTTP 200 responses.
+
+\- Enables retry behavior.
+
+\- Monitors from an external Azure test location.
+
+
+
+\### Monitoring and Alerting
+
+
+
+Azure Monitor and Log Analytics provide centralized infrastructure visibility. Application Insights provides external website availability monitoring.
+
+
+
+A scheduled query alert evaluates availability results using KQL. An Action Group provides email notification integration.
+
+
+
+\### Monitoring Validation
+
+
+
+A controlled HTTP 503 failure was simulated to validate the monitoring lifecycle.
+
+
+
+The test demonstrated:
+
+1\. Detection of failed availability checks.
+
+2\. Alert activation.
+
+3\. Application recovery.
+
+4\. Successful HTTP 200 responses.
+
+5\. Alert resolution after recovery.

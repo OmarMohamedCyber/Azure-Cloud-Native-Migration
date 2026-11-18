@@ -68,38 +68,47 @@ This project demonstrates foundational Azure security practices,
 including network traffic filtering with an NSG, restricted SSH access,
 SSH key-based authentication, network segmentation, and exclusion of
 sensitive files from source control.
-
 ## Azure Key Vault and Managed Identity
 
-Azure Key Vault was deployed using Terraform to provide centralized secret management.
+Azure Key Vault was deployed using Terraform to provide centralized
+secret management.
 
 ### Key Vault Security Configuration
 
+- Key Vault: `kv-cloudmig-2026`
+- Region: East US
 - Azure RBAC authorization enabled.
 - Purge protection enabled.
-- Seven-day soft-delete retention configured.
-- Public network access remains enabled for this lab environment.
+- Soft-delete retention configured for seven days.
 
 ### Role-Based Access Control
 
-Two role assignments were configured at Key Vault scope:
+Two role assignments were configured at the Key Vault scope:
 
-| Identity | Azure role | Purpose |
+| Identity | Azure Role | Permission |
 |---|---|---|
-| Ubuntu VM system-assigned managed identity | Key Vault Secrets User | Read secret values |
-| Administrator identity | Key Vault Secrets Officer | Manage secrets |
+| Ubuntu VM managed identity | Key Vault Secrets User | Read secret values |
+| Administrator account | Key Vault Secrets Officer | Manage secrets |
 
-The Ubuntu VM authenticates to Azure through its system-assigned managed identity, avoiding stored credentials inside the virtual machine.
+The Ubuntu VM uses a system-assigned managed identity to authenticate
+to Azure services without storing credentials inside the virtual machine.
 
-### Validation
+### Secret Retrieval Validation
 
-The integration was tested from the Ubuntu VM:
+The managed identity integration was tested from the Ubuntu VM.
+
+Validation results:
 
 - Managed identity successfully obtained a Key Vault access token.
 - Key Vault returned HTTP 200.
 - Secret retrieval succeeded.
-- Secret values were not printed in the validation output.
+- Secret values were not exposed in the validation output.
 
-### Production considerations
+This demonstrates secure workload authentication and least-privilege
+access to centrally managed secrets.
 
-For production, evaluate private endpoints and network restrictions, diagnostic logging, secret rotation, and secure remote Terraform state storage.
+### Security Considerations
+
+Public network access is currently enabled for this lab environment.
+A production deployment should evaluate private endpoints, network
+restrictions, diagnostic logging, and secure Terraform state storage.

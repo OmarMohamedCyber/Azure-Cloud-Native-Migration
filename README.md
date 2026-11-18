@@ -1,82 +1,175 @@
 # Azure Cloud-Native Migration Project
 
-A hands-on Azure infrastructure and operations portfolio project demonstrating Infrastructure as Code, Linux workload hosting, cloud identity and access management, secrets management, monitoring, alerting, and incident troubleshooting.
-
-> **Environment:** Personal Azure lab / portfolio project. This is not a production deployment.
-
 ## Project Overview
 
-Designed and deployed an Azure-hosted Linux web workload using Terraform, then expanded the environment with managed identity, Azure Key Vault, centralized monitoring, and application availability checks. The project emphasizes repeatable infrastructure, least-privilege access, operational visibility, and documented troubleshooting.
+This project demonstrates the deployment and monitoring of a cloud-hosted web application environment on Microsoft Azure using Infrastructure as Code (IaC).
 
-## Architecture and Technologies
+The objective is to establish a foundation for migrating a traditional web workload to the cloud while developing practical experience with cloud infrastructure, networking, Linux administration, security, automation, and monitoring.
 
-- **Cloud:** Microsoft Azure
-- **Infrastructure as Code:** Terraform and Bicep
-- **Compute:** Ubuntu Server 24.04 LTS virtual machine
-- **Web service:** Nginx
-- **Networking:** Azure Virtual Network, web/application subnets, Network Security Group, static public IP
-- **Identity and secrets:** System-assigned managed identity, Azure RBAC, Azure Key Vault
-- **Monitoring:** Azure Monitor Agent, Data Collection Rules, Log Analytics, Application Insights
-- **Alerting:** KQL scheduled query alert and Azure Monitor Action Group email notification
-- **Automation and tooling:** Azure CLI, PowerShell, Git, GitHub
+The project includes infrastructure provisioning, web server deployment, centralized logging, performance monitoring, availability testing, and automated alerting.
 
-## Implemented Capabilities
+## Technologies Used
 
-### Infrastructure as Code
-- Provisioned an Azure resource group, virtual network, segmented subnets, NSG, public IP, network interface, and Ubuntu VM with Terraform.
-- Used input variables for environment-specific SSH source IP configuration.
-- Used Bicep to define an Application Insights standard availability test.
+- Microsoft Azure
+- Terraform
+- Bicep
+- Azure Monitor
+- Log Analytics
+- Application Insights
+- Azure Monitor Agent (AMA)
+- Data Collection Rules (DCR)
+- Ubuntu Server 24.04 LTS
+- Nginx
+- PowerShell
+- Azure CLI
+- Git and GitHub
+- HTML
+- Azure Key Vault
+- Azure RBAC
+- Managed Identities
 
-### Workload Identity and Secrets Management
-- Enabled a system-assigned managed identity on the Linux VM.
-- Applied Azure RBAC roles at Key Vault scope: **Key Vault Secrets User** for the VM identity and **Key Vault Secrets Officer** for the administrator identity.
-- Enabled Key Vault RBAC authorization, purge protection, and soft delete.
-- Validated managed-identity authentication and secret retrieval from the VM without placing secret values in the validation output.
+## Infrastructure Deployed
 
-### Monitoring and Availability
-- Configured Azure Monitor Agent and a Data Collection Rule to collect Linux performance counters and selected Syslog events at a 60-second sampling interval.
-- Routed collected data to Log Analytics.
-- Configured an Application Insights availability test to send HTTP GET requests to the Nginx site every five minutes and expect HTTP 200 responses.
-- Created a KQL scheduled query alert and Action Group email notification.
-- Validated monitoring behavior through a controlled website outage and subsequent recovery.
+- Azure Resource Group
+- Azure Virtual Network
+- Dedicated web and application subnets
+- Network Security Group
+- Ubuntu Linux Virtual Machine
+- Static Public IP address
+- Nginx web server
+- Custom HTML landing page
+- System-assigned managed identity
+- Azure Key Vault
 
-### Troubleshooting and Operations
-- Diagnosed SSH timeouts caused by a changing ISP public IP and an NSG rule that still allowed the previous address.
-- Used PowerShell to identify the current public IP and update the local Terraform variable file, then applied the targeted NSG change.
-- Documented the incident, root cause, resolution, and lessons learned.
+## Project Architecture
+
+The architecture documentation illustrates the Azure infrastructure, network components, security controls, monitoring services, and application traffic flow.
+
+[View Azure Architecture](docs/architecture.md)
+
+## Infrastructure as Code
+
+Terraform was used to provision the foundational Azure infrastructure, including:
+
+- Resource Group
+- Virtual Network and subnets
+- Network Security Group
+- Linux Virtual Machine
+- Public IP address
+- Network interfaces
+
+Bicep was used to deploy Azure monitoring resources.
+
+This project demonstrates the use of multiple Infrastructure as Code technologies to manage cloud resources.
+
+## Application Deployment
+
+An Ubuntu Server 24.04 LTS virtual machine was deployed to Azure and configured to host a custom website using Nginx.
+
+SSH key-based authentication was configured for administrative access, with inbound SSH traffic restricted through Network Security Group rules.
+
+The website is accessible through the virtual machine's public IP address over HTTP.
+
+## Security Implementation
+
+Security controls implemented include:
+
+- SSH key-based authentication.
+- Restricted inbound SSH access using an IP address allowlist.
+- Network Security Group configuration.
+- Separation of web and application subnets.
+- System-assigned managed identity.
+- Sensitive configuration and credential files excluded from version control.
+- Azure Key Vault for centralized secret management.
+- System-assigned managed identity for VM authentication.
+- Azure RBAC with least-privilege Key Vault access.
+- Secret retrieval validation without embedded credentials.
+
+## Monitoring and Logging
+
+Azure Monitor and Log Analytics were configured to provide infrastructure monitoring and centralized logging.
+
+Implementation includes:
+
+- Log Analytics workspace.
+- Azure Monitor Agent (AMA).
+- Linux Data Collection Rule (DCR).
+- Data Collection Rule association.
+- Virtual machine heartbeat monitoring.
+- Linux performance counter collection.
+- Subscription Activity Log diagnostic settings.
+- Application Insights availability monitoring.
+
+Performance and system monitoring data is collected and queried through Log Analytics.
+
+## Availability Monitoring and Alerting
+
+Application Insights Standard availability testing was configured to monitor the Nginx website.
+
+A scheduled query alert rule was created using KQL to detect failed availability checks.
+
+The alert configuration includes:
+
+- Five-minute evaluation frequency.
+- Ten-minute evaluation window.
+- Severity 2.
+- Action Group integration for email notifications.
+- Automatic alert mitigation.
+
+### Failure Simulation and Recovery Test
+
+A controlled outage was simulated by temporarily configuring an Nginx endpoint to return HTTP 503.
+
+The monitoring workflow was validated:
+
+1. Simulated an application availability failure.
+2. Confirmed Azure recorded `Success = false`.
+3. Verified the scheduled query alert entered the Fired state.
+4. Removed the temporary failure endpoint.
+5. Confirmed the homepage returned HTTP 200 OK.
+6. Verified Azure recorded successful availability checks.
+7. Confirmed the alert transitioned to Resolved.
+
+This demonstrated the monitoring, detection, alerting, and recovery lifecycle.
 
 ## Repository Structure
 
-- `terraform/` — Azure infrastructure definitions.
-- `monitoring/` — Data Collection Rule, Bicep availability test, and PowerShell IP-monitoring script.
-- `docs/` — Architecture, deployment, security, troubleshooting, and incident documentation.
-- `screenshots/` — Selected deployment and validation evidence.
-- `website/` — Nginx website content.
-- `scripts/` — SSH source-IP update helper.
-
-## Documentation
-
-- [Architecture](docs/architecture.md)
-- [Deployment](docs/deployment.md)
-- [Security](docs/security.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Incident report: SSH access after a dynamic public IP change](docs/incidents/INC-002-dynamic-public-ip-ssh-access.md)
-
-## Monitoring Source Files
-
-- [Application Insights availability test (Bicep)](monitoring/bicep/availability-test.bicep)
-- [Linux Data Collection Rule example (sanitized)](monitoring/linux-dcr.example.json)
-- [Public IP change notification script (PowerShell)](monitoring/scripts/monitor-public-ip.ps1)
-
-## Security Notes and Lab Limitations
-
-- SSH is configured for public-key authentication; password-based SSH authentication is disabled.
-- Inbound SSH is restricted to a configurable authorized source IP (/32); HTTP port 80 is open for the demonstration website.
-- Terraform state, local `.tfvars`, private keys, credentials, and local public-IP monitoring state must remain out of version control.
-- Key Vault public network access is enabled for this lab. A production design should evaluate private endpoints, network restrictions, diagnostic settings, secret rotation, and secure remote Terraform state.
-- The demo website currently uses HTTP. Production hosting should use HTTPS/TLS and an appropriately hardened network design.
-- The web subnet is provisioned as a separate network segment; the current Ubuntu workload is deployed in the application subnet.
+- `terraform/` — Terraform infrastructure configuration.
+- `monitoring/` — Azure monitoring configuration, Bicep templates, and scripts.
+- `scripts/` — PowerShell automation scripts.
+- `website/` — Custom HTML website files.
+- `docs/` — Architecture and project documentation.
+- `screenshots/` — Deployment, monitoring, and testing evidence.
 
 ## Skills Demonstrated
 
-Azure infrastructure provisioning, Terraform, Bicep, Azure networking, Linux administration, Nginx, managed identities, Azure RBAC, Key Vault, Azure Monitor, Log Analytics, Application Insights, KQL, PowerShell automation, troubleshooting, and technical documentation.
+- Microsoft Azure administration.
+- Infrastructure as Code using Terraform and Bicep.
+- Azure networking and security.
+- Linux server administration.
+- Nginx web server configuration.
+- Azure Monitor and Log Analytics.
+- Application Insights availability monitoring.
+- Kusto Query Language (KQL).
+- Azure Monitor Agent and Data Collection Rules.
+- Scheduled query alerts and Action Groups.
+- PowerShell automation.
+- Azure CLI.
+- Troubleshooting and incident recovery.
+- Git and GitHub documentation.
+- Azure Key Vault administration.
+- Managed Identity authentication.
+- Azure role-based access control (RBAC).
+- Secure cloud secret management.
+
+## Future Improvements
+
+- Configure HTTPS using TLS certificates.
+- Introduce Docker containerization.
+- Implement a CI/CD pipeline using GitHub Actions.
+- Explore Azure-native application hosting services.
+- Expand infrastructure deployment automation.
+
+## Screenshot Gallery
+
+Visual evidence of the infrastructure deployment, Linux configuration, Azure security controls, monitoring, and availability testing is available in the [Project Screenshot Gallery](docs/screenshots.md).
