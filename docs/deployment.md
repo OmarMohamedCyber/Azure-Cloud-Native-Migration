@@ -87,3 +87,30 @@ The project demonstrates practical experience with:
 -   SSH administration
 -   Nginx web server configuration
 -   Git and GitHub version control
+
+## Monitoring and Observability
+
+The project was extended with Azure monitoring capabilities.
+
+### Data Collection Rule
+
+A Data Collection Rule (DCR) and Azure Monitor Agent configuration collect Linux telemetry and route it to the Log Analytics workspace.
+
+- Performance counters: processor utilization, available memory, and logical disk free space.
+- Sampling interval: 60 seconds.
+- Syslog facilities include authentication, cron, daemon, kernel, syslog, and user.
+- Syslog collection is configured for Warning, Error, Critical, Alert, and Emergency events.
+
+### Application Availability
+
+A Bicep template deploys an Application Insights Standard availability test for the Nginx website.
+
+- HTTP GET request every five minutes.
+- 30-second timeout.
+- Expected HTTP status: 200.
+- Retry behavior enabled.
+- External test location configured.
+
+### Alerting and Validation
+
+A KQL scheduled query alert evaluates availability results and uses an Azure Monitor Action Group for email notifications. Monitoring behavior was validated with a controlled HTTP 503 outage simulation followed by recovery.
