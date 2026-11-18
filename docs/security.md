@@ -68,3 +68,38 @@ This project demonstrates foundational Azure security practices,
 including network traffic filtering with an NSG, restricted SSH access,
 SSH key-based authentication, network segmentation, and exclusion of
 sensitive files from source control.
+
+## Azure Key Vault and Managed Identity
+
+Azure Key Vault was deployed using Terraform to provide centralized secret management.
+
+### Key Vault Security Configuration
+
+- Azure RBAC authorization enabled.
+- Purge protection enabled.
+- Seven-day soft-delete retention configured.
+- Public network access remains enabled for this lab environment.
+
+### Role-Based Access Control
+
+Two role assignments were configured at Key Vault scope:
+
+| Identity | Azure role | Purpose |
+|---|---|---|
+| Ubuntu VM system-assigned managed identity | Key Vault Secrets User | Read secret values |
+| Administrator identity | Key Vault Secrets Officer | Manage secrets |
+
+The Ubuntu VM authenticates to Azure through its system-assigned managed identity, avoiding stored credentials inside the virtual machine.
+
+### Validation
+
+The integration was tested from the Ubuntu VM:
+
+- Managed identity successfully obtained a Key Vault access token.
+- Key Vault returned HTTP 200.
+- Secret retrieval succeeded.
+- Secret values were not printed in the validation output.
+
+### Production considerations
+
+For production, evaluate private endpoints and network restrictions, diagnostic logging, secret rotation, and secure remote Terraform state storage.
