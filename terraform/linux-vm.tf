@@ -35,6 +35,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location            = azurerm_resource_group.rg.location
   size                = "Standard_D2s_v3"
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   admin_username                  = var.admin_username
   disable_password_authentication = true
 
